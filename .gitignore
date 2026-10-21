@@ -1,0 +1,10 @@
+node_modules/
+dist/
+data/raw/
+*.log
+.DS_Store
+test-results/
+screenshots/
+__pycache__/
+*.pyc
+.venv/

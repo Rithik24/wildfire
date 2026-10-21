@@ -1,0 +1,9 @@
+h5py>=3.11
+numpy>=2.0
+scipy>=1.13
+shapely>=2.0
+pyproj>=3.6
+rasterio>=1.4
+pillow>=10.4
+requests>=2.32
+mgrs>=1.5

@@ -1,0 +1,52 @@
+{
+ "incidents": [
+  {
+   "id": "park-2024",
+   "name": "Park Fire",
+   "region": "Butte & Tehama Counties, California, USA",
+   "country": "US",
+   "start": "2024-07-24T18:00:00Z",
+   "end": "2024-08-20T00:00:00Z",
+   "center": [
+    -121.80000000000001,
+    40.07
+   ],
+   "area_ha": 171113.0,
+   "detections": 23026,
+   "reported_acres": 429603,
+   "thumb": "park-2024/thumb.jpg"
+  },
+  {
+   "id": "pantanal-2024",
+   "name": "Pantanal Fires \u00b7 Corumb\u00e1",
+   "region": "Corumb\u00e1, Mato Grosso do Sul, Brazil",
+   "country": "BR",
+   "start": "2024-06-01T00:00:00Z",
+   "end": "2024-07-01T00:00:00Z",
+   "center": [
+    -57.55,
+    -18.825
+   ],
+   "area_ha": 243258.0,
+   "detections": 32826,
+   "reported_acres": null,
+   "thumb": "pantanal-2024/thumb.jpg"
+  },
+  {
+   "id": "palisades-2025",
+   "name": "Palisades Fire",
+   "region": "Pacific Palisades, Los Angeles, California, USA",
+   "country": "US",
+   "start": "2025-01-07T16:00:00Z",
+   "end": "2025-01-20T00:00:00Z",
+   "center": [
+    -118.6,
+    34.08
+   ],
+   "area_ha": 10113.0,
+   "detections": 3655,
+   "reported_acres": 23448,
+   "thumb": "palisades-2025/thumb.jpg"
+  }
+ ]
+}
