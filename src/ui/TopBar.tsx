@@ -56,7 +56,7 @@ export function TopBar() {
         <Icon name="calendar" size={14} /> {fmt.date(t0)} · {days} d
       </span>
       {liveCount > 0 && (
-        <button className="tb-live" onClick={() => set({ panel: "incidents", pickerTab: "live" })} title="Fires burning now, found by scanning every VIIRS fire pixel on Earth">
+        <button className="tb-live" onClick={() => set({ panel: "incidents", pickerTab: "live" })} title="Fires burning now, found by scanning every VIIRS fire pixel on Earth" aria-label={`${liveCount} burning now`}>
           <span className="live-dot" />
           <span className="lbl">{liveCount} burning now</span>
           <span className="sm">{liveCount}</span>

@@ -1838,3 +1838,16 @@ a {
     width: 130px;
   }
 }
+
+@media (max-width: 480px) {
+  .tb-live .sm {
+    display: none;
+  }
+  .tb-live {
+    gap: 0;
+    padding: 5px 7px;
+  }
+  .topbar {
+    gap: 4px;
+  }
+}
