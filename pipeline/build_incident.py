@@ -127,7 +127,7 @@ def build(incident_id, raw_dir, out_dir, res_m=100, close_m=450, max_hole_ha=300
     g = Grid(bbox, res_m)
     H, W = g.height, g.width
     if inc.get("isolate") and inc.get("origin"):
-        det = isolate_fire(det, g, inc["origin"])
+        det = isolate_fire(det, g, inc["origin"], link_m=inc.get("isolate_link_m", 1200))
         n_det = len(det["t"])
         print(f"{incident_id}: kept {n_det} detections connected to the origin")
     col, row = g.to_pixel(det["lon"], det["lat"])
@@ -230,7 +230,7 @@ def build(incident_id, raw_dir, out_dir, res_m=100, close_m=450, max_hole_ha=300
         dnbr_min = sc.get("dnbr_min", dnbr_min)
         nbr_post_max = sc.get("nbr_post_max", 1.0)
         arrival, dnbr_grid, scar_stats = refine_with_s2(arrival, g, s2_path, os.path.join(raw_dir, incident_id, "s2.json"),
-                                                        dnbr_min, nbr_post_max)
+                                                        dnbr_min, nbr_post_max, reach_m=sc.get("reach_m", 1500))
         write_severity(arrival, g, s2_path, os.path.join(raw_dir, incident_id, "s2.json"), out_dir if write else None,
                        dnbr_min, nbr_post_max)
         scar_method = "s2-dnbr"

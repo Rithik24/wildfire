@@ -103,7 +103,7 @@ class Airports:
         return best
 
 
-def select(cx, k, min_km=350, per_country=3, gaz=None):
+def select(cx, k, min_km=350, per_country=2, gaz=None):
     """Most significant active complexes: burned extent × compactness × density, spread over the globe."""
     cand = []
     for c in cx:
@@ -148,6 +148,11 @@ def densest_window(lon, lat, bbox, size=(0.9, 0.8)):
     return [cx - min(bw, e - w) / 2, cy - min(bh, n - s) / 2, cx + min(bw, e - w) / 2, cy + min(bh, n - s) / 2]
 
 
+def compass_dir(frm, to):
+    b = (math.degrees(math.atan2((to[0] - frm[0]) * math.cos(math.radians(frm[1])), to[1] - frm[1])) + 360) % 360
+    return ["N", "NE", "E", "SE", "S", "SW", "W", "NW"][int((b + 22.5) // 45) % 8]
+
+
 def fleet_for(country):
     if country in ("United States of America", "United States", "Canada"):
         return "us"
@@ -173,10 +178,13 @@ def describe(c, px, t_end, gaz, airports, tzf):
     # staging just outside the burning area, on the side of the named town
     icp_ll = [min(max(place["lonlat"][0], bbox[0] - 0.02), bbox[2] + 0.02), min(max(place["lonlat"][1], bbox[1] - 0.02), bbox[3] + 0.02)]
     pid = f"live-{slug(place['country'])[:20]}-{slug(place['name'])[:24]}"
-    near = f"{place['km']:.0f} km from {place['name']}" if place["km"] > 3 else place["name"]
+    dirn = compass_dir(place["lonlat"], center)
+    near = f"{place['km']:.0f} km {dirn} of {place['name']}" if place["km"] > 3 else place["name"]
     region = ", ".join(x for x in (place["adm1"], place["country"]) if x)
+    # remote fires are named after their province rather than a far-away town
+    title = f"Fire near {place['name']}" if place["km"] <= 60 or not place["adm1"] else f"Fire in {place['adm1']}"
     return pid, {
-        "name": f"Fire near {place['name']}",
+        "name": title,
         "region": f"{region} · {near}",
         "country": place["country"],
         "bbox": bbox,

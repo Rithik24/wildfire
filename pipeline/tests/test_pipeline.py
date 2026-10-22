@@ -111,3 +111,10 @@ def test_gazetteer_ignores_unknown_population(tmp_path):
     ]
     (tmp_path / "ne_places.geojson").write_text(json.dumps({"features": feats}))
     assert Gazetteer(str(tmp_path)).near(10.2, 10.1)["name"] == "Near"
+
+
+def test_compass_dir():
+    from pipeline.live import compass_dir
+    assert compass_dir([0, 0], [0, 1]) == "N"
+    assert compass_dir([0, 0], [1, 1]) == "NE"
+    assert compass_dir([10, 10], [9, 10]) == "W"

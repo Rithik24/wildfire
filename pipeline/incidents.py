@@ -140,9 +140,12 @@ INCIDENTS = {
         "name": "Smokehouse Creek Fire",
         "region": "Texas Panhandle & Oklahoma, USA",
         "country": "US",
-        "bbox": None,
-        "search_bbox": [-101.8, 35.2, -99.5, 36.7],
-        "bbox_size_deg": [1.9, 1.15],
+        "bbox": [-101.62, 35.42, -99.85, 36.15],
+        # grass fire: it outran the overpasses, so pixels are sparse; link them over 5 km to keep
+        # the Smokehouse Creek run and drop the separate Windy Deuce Fire to the south-west
+        "isolate": True,
+        "isolate_link_m": 5000,
+        "scar": {"dnbr_min": 0.1, "reach_m": 6000},
         "start": "2024-02-26T20:00:00Z",
         "end": "2024-03-06T00:00:00Z",
         "timezone": "America/Chicago",
@@ -187,6 +190,7 @@ INCIDENTS = {
         "base": {"name": "Hinton/Jasper-Hinton Airport", "lonlat": [-117.753, 53.319]},
         "icp": {"name": "Staging area (sim)", "lonlat": [-118.08, 52.88]},
         "reported": {
+            "final_acres": 80858,  # 32,722 ha when declared under control, 7 Sep 2024
             "structures_destroyed": 358,
             "facts": [
                 {"t": "2024-07-25T04:00:00Z", "text": "Fire reaches the Jasper townsite on winds of up to 100 km/h", "source": "The Weather Network"},
