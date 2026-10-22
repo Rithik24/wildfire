@@ -117,7 +117,7 @@ npm run build      # → dist/ (relative paths: works on GitHub Pages, Vercel or
 The incident packages are committed in `public/data/`, so the app needs nothing else. Basemap imagery (Esri) and terrain (AWS Terrain Tiles) load from public tile servers. If imagery is blocked, the bundled Sentinel-2 images still cover each fire.
 
 **Deploy.**
-- **GitHub Pages:** `.github/workflows/pages.yml` publishes `dist/` on every push to `main`. Enable it under *Settings → Pages → Source: GitHub Actions*.
+- **GitHub Pages:** `.github/workflows/pages.yml` publishes `dist/` on every push to the repository's default branch. Enable it under *Settings → Pages → Source: GitHub Actions*.
 - **Vercel:** `vercel.json` is included.
 
 ## Rebuild the data, or add a fire
