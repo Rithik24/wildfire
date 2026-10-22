@@ -1,5 +1,7 @@
 # Emberline: wildfire intelligence on a 3D map
 
+🌐 **Live:** https://rithik24.github.io/wildfire/ · runs entirely in your browser
+
 **Watch a wildfire grow hour by hour, track its hot spots with a drone fleet and rehearse the firefighting response, all rebuilt from open satellite data.**
 
 ![Park Fire, night of 25–26 July 2024: the front running north on 3D terrain, smoke drifting with the observed wind](docs/img/hero.jpg)
