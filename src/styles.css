@@ -561,7 +561,7 @@ a {
 /* stat tiles */
 .tiles {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px 8px;
 }
 
@@ -573,8 +573,17 @@ a {
   font-size: 11.5px;
 }
 
+.card {
+  container-type: inline-size;
+}
+
+.tile {
+  min-width: 0;
+}
+
 .tile .val {
-  font-size: 18px;
+  font-size: clamp(13px, 5.4cqi, 18px);
+  white-space: nowrap;
   font-weight: 650;
   letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
@@ -600,7 +609,7 @@ a {
 }
 
 .kpis .tile .val {
-  font-size: 20px;
+  font-size: clamp(13px, 5.6cqi, 20px);
 }
 
 /* lists */
@@ -777,6 +786,7 @@ a {
 .track {
   position: relative;
   height: 52px;
+  margin-top: 10px;
   cursor: pointer;
   user-select: none;
   touch-action: none;
@@ -790,7 +800,7 @@ a {
 
 .playhead-tag {
   position: absolute;
-  top: -6px;
+  top: -12px;
   transform: translateX(-50%);
   background: var(--text);
   color: var(--card);
@@ -1602,6 +1612,14 @@ a {
   }
   .tb-incident {
     padding: 6px 2px;
+    max-width: none;
+  }
+  .topbar > * {
+    flex-shrink: 0;
+  }
+  .modes .badge,
+  .tb-btn > svg:last-child:not(:first-child) {
+    display: none;
   }
   .timeline {
     grid-template-columns: 1fr;

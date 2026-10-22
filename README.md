@@ -160,6 +160,8 @@ npm run typecheck
 npm run build && npx vite preview --port 4173 &
 npm i --no-save playwright && npx playwright install chromium
 npm run smoke                    # opens every incident in Chromium, walks the 3 modes, checks layers and errors
+npm run e2e                      # drives every control (26 checks): timeline, keyboard, layers, menus, camera,
+                                 # share links, languages, tour, incident picker, mobile layout
 ```
 
 CI (`.github/workflows/ci.yml`) runs the typecheck, the build and the pipeline tests on every push.

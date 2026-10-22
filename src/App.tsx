@@ -17,7 +17,7 @@ function usePlayback() {
     let raf = 0;
     let last = performance.now();
     const tick = (now: number) => {
-      const dt = Math.min(0.1, (now - last) / 1000);
+      const dt = Math.min(0.5, (now - last) / 1000); // keep the requested speed on slow devices; cap tab-switch jumps
       last = now;
       const s = useStore.getState();
       if (s.playing && s.bundle) {

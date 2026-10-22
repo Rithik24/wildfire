@@ -170,3 +170,6 @@ export function useQuantTime(step = 600): number {
 export function timeRange(b: IncidentBundle): [number, number] {
   return [Date.parse(b.meta.t0) / 1000, Date.parse(b.meta.end) / 1000];
 }
+
+// Diagnostic handle used by scripts/e2e.mjs and handy in the console.
+(window as unknown as { __store: typeof useStore }).__store = useStore;

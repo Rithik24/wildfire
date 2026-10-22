@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useStore } from "../store";
-import { useT } from "../i18n";
+import { locale, useT, type Lang } from "../i18n";
 import { useFmt } from "../lib/format";
 import { Icon } from "./icons";
 import { Chip } from "./common";
@@ -35,6 +35,7 @@ export function Modals() {
 
 function IncidentsModal({ onClose }: { onClose: () => void }) {
   const index = useStore((s) => s.index);
+  const lang = useStore((s) => s.lang);
   const cur = useStore((s) => s.incidentId);
   const fmt = useFmt();
   const t = useT();
@@ -54,12 +55,12 @@ function IncidentsModal({ onClose }: { onClose: () => void }) {
               if (i.id !== cur) selectIncident(i.id);
             }}
           >
-            {i.thumb ? <img src={`data/${i.thumb}`} alt={`Burn scar of ${i.name}`} loading="lazy" /> : <div style={{ aspectRatio: "16/10" }} />}
+            {i.thumb ? <img src={`data/${i.thumb}`} alt={`Burn scar of ${i.name}`} decoding="async" /> : <div style={{ aspectRatio: "16/10" }} />}
             <div className="b">
               <b>{i.name}</b>
               <div className="muted">{i.region}</div>
               <div style={{ marginTop: 6, display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
-                <span>{fmt.date(Date.parse(i.start) / 1000)}</span>·<span>{fmt.area(i.area_ha)}</span>
+                <span>{startDate(i.start, lang)}</span>·<span>{fmt.area(i.area_ha)}</span>
                 <Chip p="derived" />
               </div>
               <div className="muted" style={{ fontSize: 11.5, marginTop: 2 }}>
@@ -144,7 +145,7 @@ function AboutModal({ onClose }: { onClose: () => void }) {
               <tr>
                 <td>Sentinel-2 scenes</td>
                 <td>
-                  before: {m.imagery.pre.scenes.map((s) => s.date).join(", ")} ({m.imagery.pre.clear_pct}% clear) · after: {m.imagery.post.scenes.map((s) => s.date).join(", ")} ({m.imagery.post.clear_pct}% clear)
+                  before: {uniqueDates(m.imagery.pre.scenes)} ({m.imagery.pre.scenes.length} scenes, {m.imagery.pre.clear_pct}% clear) · after: {uniqueDates(m.imagery.post.scenes)} ({m.imagery.post.scenes.length} scenes, {m.imagery.post.clear_pct}% clear)
                 </td>
               </tr>
             )}
@@ -191,6 +192,15 @@ function AboutModal({ onClose }: { onClose: () => void }) {
       <p className="muted">Keyboard: Space play/pause · ←/→ one hour (Shift: one day) · [ / ] events · , / . satellite passes · 1/2/3 modes · R reset view · Esc close.</p>
     </Modal>
   );
+}
+
+/** Calendar start date of an incident (its UTC date), independent of the open incident's time zone. */
+function startDate(iso: string, lang: Lang): string {
+  return new Intl.DateTimeFormat(locale(lang), { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" }).format(Date.parse(`${iso.slice(0, 10)}T12:00:00Z`));
+}
+
+function uniqueDates(scenes: { date: string }[]): string {
+  return [...new Set(scenes.map((s) => s.date))].sort().join(", ");
 }
 
 const FIRMS_SOURCES = ["VIIRS_NOAA20_NRT", "VIIRS_NOAA21_NRT", "VIIRS_SNPP_NRT", "MODIS_NRT"];
