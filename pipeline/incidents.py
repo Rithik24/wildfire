@@ -264,13 +264,13 @@ INCIDENTS = {
         "name": "Larouco Fire",
         "region": "Ourense & Lugo, Galicia, Spain",
         "country": "ES",
-        "bbox": None,
-        "search_bbox": [-7.45, 42.20, -6.95, 42.70],
-        "bbox_size_deg": [0.5, 0.42],
+        "bbox": [-7.28, 42.27, -6.79, 42.61],
         "start": "2025-08-13T16:00:00Z",
         "end": "2025-08-27T00:00:00Z",
         "timezone": "Europe/Madrid",
-        "origin": None,
+        "origin": [-7.16, 42.35],  # Seadur parish, Larouco
+        # other large fires burned in Ourense the same week: keep the one that started at the origin
+        "isolate": True,
         "isd_station": "08048099999",  # Orense
         "isd_fallback": ["08053099999"],
         "s2_pre": ["2025-07-20", "2025-08-12"],
@@ -278,12 +278,13 @@ INCIDENTS = {
         "base": {"name": "Ourense air base (approx.)", "lonlat": [-7.86, 42.34]},
         "icp": {"name": "Staging area (sim)", "lonlat": [-7.16, 42.34]},
         "reported": {
-            "final_acres": 74132,
+            "final_acres": 78525,  # 31,778 ha in Galician territory (Xunta, at extinction)
             "facts": [
-                {"t": "2025-08-13T16:55:00Z", "text": "Fire starts at 18:55 in the parish of Seadur, Larouco", "source": "The Objective"},
+                {"t": "2025-08-13T16:55:00Z", "text": "Fire starts at 18:55 in the parish of Seadur, Larouco", "source": "Xunta de Galicia"},
                 {"t": "2025-08-23T10:00:00Z", "text": "Declared stabilised at ~30,000 ha: the largest fire in Galicia's history", "source": "The Objective"},
             ],
             "sources": [
+                {"label": "Xunta de Galicia · Larouco fire extinguished (31,778 ha)", "url": "https://www.xunta.gal/notas-de-prensa/-/nova/016163/medio-rural-informa-situacion-dos-lumes-forestais-con-datos-recollidos-ata-14"},
                 {"label": "The Objective · Larouco stabilised", "url": "https://theobjective.com/actualidad/2025-08-23/estabilizado-incendio-larouco-mayor-galicia/"},
                 {"label": "Euronews · Spain wildfires", "url": "https://www.euronews.com/2025/08/14/wildfires-destroy-thousands-of-hectares-in-spain"},
             ],

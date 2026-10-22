@@ -126,6 +126,10 @@ def build(incident_id, raw_dir, out_dir, res_m=100, close_m=450, max_hole_ha=300
 
     g = Grid(bbox, res_m)
     H, W = g.height, g.width
+    if inc.get("isolate") and inc.get("origin"):
+        det = isolate_fire(det, g, inc["origin"])
+        n_det = len(det["t"])
+        print(f"{incident_id}: kept {n_det} detections connected to the origin")
     col, row = g.to_pixel(det["lon"], det["lat"])
 
     # Overpasses that looked at the bbox (with or without detections).
@@ -394,6 +398,34 @@ def write_thumbnail(out_dir, width=480):
     a.alpha_composite(b)
     h = int(a.height * width / a.width)
     a.convert("RGB").resize((width, h), Image.LANCZOS).save(os.path.join(out_dir, "thumb.jpg"), quality=80)
+
+
+def isolate_fire(det, g, origin, link_m=1200, search_m=4000):
+    """Keep only the fire that contains `origin` when other fires burn in the same box.
+
+    Pixels are linked when their cells lie within `link_m`; the component under the
+    origin (or the nearest one within `search_m`) is kept.
+    """
+    H, W = g.height, g.width
+    c, r = g.to_pixel(det["lon"], det["lat"])
+    ci = np.clip(np.round(c).astype(int), 0, W - 1)
+    ri = np.clip(np.round(r).astype(int), 0, H - 1)
+    occ = np.zeros((H, W), bool)
+    occ[ri, ci] = True
+    rad = max(1, int(round(link_m / 2 / g.ground_res)))
+    grown = ndimage.binary_dilation(occ, structure=disk(rad))
+    lab, n = ndimage.label(grown)
+    oc, orow = g.to_pixel(*origin)
+    oc, orow = int(round(float(oc))), int(round(float(orow)))
+    target = lab[orow, oc] if 0 <= orow < H and 0 <= oc < W else 0
+    if target == 0:
+        dist, (rr, cc) = ndimage.distance_transform_edt(lab == 0, return_indices=True)
+        if dist[orow, oc] * g.ground_res <= search_m:
+            target = lab[rr[orow, oc], cc[orow, oc]]
+    if target == 0:
+        return det
+    keep = lab[ri, ci] == target
+    return {k: v[keep] for k, v in det.items()}
 
 
 def write_severity(arrival, g, npz_path, info_path, out_dir, dnbr_min, nbr_post_max):
