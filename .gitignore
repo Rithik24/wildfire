@@ -12,3 +12,4 @@ __pycache__/
 # rebuilt by the Pages workflow on every deploy
 public/data/live/
 public/data/live-*/
+*.tsbuildinfo
