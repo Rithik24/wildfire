@@ -45,6 +45,10 @@ SEVERITY = [  # (dNBR lower bound, label, RGBA)
 os.environ.setdefault("GDAL_DISABLE_READDIR_ON_OPEN", "EMPTY_DIR")
 os.environ.setdefault("GDAL_HTTP_MULTIRANGE", "YES")
 os.environ.setdefault("GDAL_HTTP_MERGE_CONSECUTIVE_RANGES", "YES")
+os.environ.setdefault("GDAL_HTTP_TIMEOUT", "60")  # seconds; GDAL waits forever by default
+os.environ.setdefault("GDAL_HTTP_CONNECTTIMEOUT", "20")
+os.environ.setdefault("GDAL_HTTP_MAX_RETRY", "3")
+os.environ.setdefault("GDAL_HTTP_RETRY_DELAY", "2")
 os.environ.setdefault("VSI_CACHE", "TRUE")
 os.environ.setdefault("CPL_VSIL_CURL_ALLOWED_EXTENSIONS", ".tif")
 if os.path.exists("/root/.ccr/ca-bundle.crt"):

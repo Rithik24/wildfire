@@ -46,11 +46,13 @@ jobs:
       - name: Scan every VIIRS fire pixel on Earth
         id: scan
         continue-on-error: true
+        timeout-minutes: 25
         run: python -m pipeline.scan_global --days 8 --out public/data/live
 
       - name: Build the fires burning now
         if: steps.scan.outcome == 'success'
         continue-on-error: true
+        timeout-minutes: 45
         run: python -W ignore -m pipeline.live --max 10
 
       - name: Catalogue

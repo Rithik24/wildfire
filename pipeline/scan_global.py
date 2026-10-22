@@ -18,6 +18,7 @@ import argparse
 import concurrent.futures as cf
 import datetime as dt
 import json
+import multiprocessing as mp
 import os
 import sys
 import time
@@ -87,7 +88,7 @@ def granule_time(key):
     return dt.datetime.strptime(m.group(1), "%Y%m%d%H%M%S").replace(tzinfo=dt.timezone.utc)
 
 
-def scan(t_end, days, workers=32):
+def scan(t_end, days, workers=32, deadline_s=900):
     t_start = t_end - dt.timedelta(days=days)
     tasks = []
     d = t_start.date()
@@ -105,14 +106,27 @@ def scan(t_end, days, workers=32):
     parts = []
     done = 0
     t0 = time.time()
-    with cf.ProcessPoolExecutor(workers) as ex:
-        for sat, key, r in ex.map(_read, tasks, chunksize=4):
+    # forkserver: never fork a process that has run threads. A stuck worker must not hold the scan
+    # hostage either: past the deadline, keep what came back and kill the pool.
+    ex = cf.ProcessPoolExecutor(workers, mp_context=mp.get_context("forkserver"))
+    futs = [ex.submit(_read, task) for task in tasks]
+    try:
+        for fut in cf.as_completed(futs, timeout=deadline_s):
+            sat, key, r = fut.result()
             done += 1
             if r is not None:
                 r["sat"] = np.full(len(r["t"]), list(SATELLITES).index(sat), np.int8)
                 parts.append(r)
             if done % 500 == 0:
                 print(f"  {done}/{len(tasks)} granules, {time.time() - t0:.0f}s", file=sys.stderr)
+    except cf.TimeoutError:
+        print(f"deadline: {len(tasks) - done} granules unread after {deadline_s}s, continuing without them", file=sys.stderr)
+    finally:
+        procs = list((ex._processes or {}).values())
+        ex.shutdown(wait=False, cancel_futures=True)
+        for pr in procs:
+            if pr.is_alive():
+                pr.kill()
     if not parts:
         return {k: np.array([]) for k in ("t", "lat", "lon", "frp", "mask", "day", "sat", "bt4", "zen")}
     px = {k: np.concatenate([p[k] for p in parts]) for k in parts[0]}
