@@ -66,6 +66,9 @@ export interface CameraRequest {
 
 interface State {
   index: IncidentIndexItem[];
+  worldPath: string | null;
+  liveUpdated: string | null;
+  pickerTab: "live" | "archive";
   incidentId: string | null;
   bundle: IncidentBundle | null;
   loading: number | null;
@@ -111,6 +114,9 @@ let toastTimer: ReturnType<typeof setTimeout> | undefined;
 
 export const useStore = create<State>((set, get) => ({
   index: [],
+  worldPath: null,
+  liveUpdated: null,
+  pickerTab: "archive",
   incidentId: null,
   bundle: null,
   loading: null,

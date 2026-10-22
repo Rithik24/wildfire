@@ -97,7 +97,8 @@ export interface IncidentMeta {
   };
   base: { name: string; lonlat: [number, number] };
   icp: { name: string; lonlat: [number, number] };
-  fleet: "us" | "br";
+  fleet: "us" | "br" | "intl";
+  live?: LiveInfo;
   imagery?: {
     corners: [number, number][];
     res_m: number;
@@ -149,6 +150,7 @@ export interface WeatherHour {
 export interface Weather {
   station: { id: string; name: string; lat: number; lon: number; elev_m: number };
   source: string;
+  prov?: Prov;
   hourly: WeatherHour[];
   notes: { t: number; kind: string; metar: string }[];
 }
@@ -186,6 +188,29 @@ export interface IncidentIndexItem {
   detections: number;
   reported_acres?: number;
   thumb: string | null;
+  live?: LiveInfo;
+}
+
+export interface LiveInfo {
+  updated: string;
+  rank: number;
+  active_24h: number;
+}
+
+export interface IncidentIndex {
+  incidents: IncidentIndexItem[];
+  world: string | null;
+  updated: string | null;
+}
+
+export interface WorldFires {
+  updated: string;
+  window_h: number;
+  bin_deg: number;
+  pixels_48h: number;
+  /** [lon, lat, pixels, frp MW] per bin */
+  bins: [number, number, number, number][];
+  complexes: { center: [number, number]; bbox: number[]; pixels: number; area_km2_est: number; frp_max: number; recent_24h: number; first: number; last: number }[];
 }
 
 export interface IncidentBundle {
@@ -196,4 +221,5 @@ export interface IncidentBundle {
   arrival: Arrival;
   perimeters: Perimeters;
   base: string; // URL prefix of the package
+  version: string; // query string appended to package files ("" for archived incidents)
 }

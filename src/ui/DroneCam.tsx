@@ -62,7 +62,7 @@ function loadImagery(b: IncidentBundle) {
       try {
         const img = new Image();
         img.crossOrigin = "anonymous";
-        img.src = b.base + name;
+        img.src = b.base + name + b.version;
         await img.decode();
         const scale = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
         const c = document.createElement("canvas");

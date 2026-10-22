@@ -112,9 +112,10 @@ export function App() {
       mode: url.mode ?? "incident",
     });
     loadIndex()
-      .then((idx) => {
-        useStore.getState().set({ index: idx });
-        const id = url.incident && idx.some((i) => i.id === url.incident) ? url.incident : idx[0]?.id;
+      .then(({ incidents: idx, world, updated }) => {
+        useStore.getState().set({ index: idx, worldPath: world, liveUpdated: updated });
+        // a shared link wins; otherwise open the flagship replay (live fires are one click away)
+        const id = url.incident && idx.some((i) => i.id === url.incident) ? url.incident : idx.find((i) => i.id === "park-2024")?.id ?? idx[0]?.id;
         if (id) return selectIncident(id, url).then(() => url.tour && useStore.getState().set({ tour: 0 }));
       })
       .catch((e) => useStore.getState().set({ error: String(e) }));

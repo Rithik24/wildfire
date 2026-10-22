@@ -7,3 +7,4 @@ rasterio>=1.4
 pillow>=10.4
 requests>=2.32
 mgrs>=1.5
+timezonefinder>=6.5

@@ -320,6 +320,38 @@ await check("incident picker switches incidents", async () => {
   return a === "palisades-2025" && b === "pantanal-2024";
 });
 
+await check("picker: archive search, world map pins, live tab", async () => {
+  await page.click(".tb-incident");
+  await page.waitForTimeout(1500);
+  const pins = await page.locator(".wm-pin:not(.static)").count();
+  const total = await st(() => window.__store.getState().index.length);
+  await page.fill(".picker-bar input", "japan");
+  const filtered = await page.locator(".inc-card").count();
+  await page.fill(".picker-bar input", "");
+  const liveN = await st(() => window.__store.getState().index.filter((i) => i.live).length);
+  let liveOk = true;
+  if (liveN) {
+    await page.click(".picker-bar button:has-text('Burning now')");
+    liveOk = (await page.locator(".inc-card").count()) === liveN && (await page.locator(".inc-card .live-tag").count()) === liveN;
+  }
+  await page.keyboard.press("Escape");
+  return pins === total && filtered >= 1 && filtered < total && liveOk;
+});
+
+await check("live fire opens on 'now' with model weather and no severity layer", async () => {
+  const live = await st(() => window.__store.getState().index.find((i) => i.live)?.id ?? null);
+  if (!live) return true; // build without a live scan
+  await page.click(".tb-live");
+  await page.click(".inc-card >> nth=0");
+  await ready();
+  await page.waitForTimeout(1000);
+  const s = await store();
+  const end = await st(() => Date.parse(window.__store.getState().bundle.meta.end) / 1000);
+  const sev = await page.locator(".layer", { hasText: "Burn severity" }).count();
+  const tag = await page.locator(".tb-incident .live-tag").count();
+  return s.incidentId.startsWith("live-") && Math.abs(s.time - end) < 3600 && sev === 0 && tag === 1;
+});
+
 // mobile
 const m = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
 m.on("pageerror", (e) => errors.push(`mobile pageerror: ${e.message}`));

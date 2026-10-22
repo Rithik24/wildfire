@@ -56,6 +56,22 @@ const BR_UNITS: UnitSpec[] = [
   { id: "TR-02", name: "Crawler tractor (firebreak)", group: "crews", kind: "dozer", capacityGal: 0, speedKmh: 3, reloadMin: 0, dropLenM: 0, agent: null, crew: 2, responseH: 10 },
 ];
 
+// Generic international response (Europe, Asia, Africa, Oceania): scoopers, SEATs, helicopters.
+const INTL_UNITS: UnitSpec[] = [
+  { id: "CL-21", name: "Canadair CL-415 scooper", group: "air", kind: "lat", capacityGal: 1620, speedKmh: 330, reloadMin: 8, dropLenM: 600, agent: "water", crew: 2, responseH: 2 },
+  { id: "CL-22", name: "Canadair CL-415 scooper", group: "air", kind: "lat", capacityGal: 1620, speedKmh: 330, reloadMin: 8, dropLenM: 600, agent: "water", crew: 2, responseH: 3 },
+  { id: "AT-31", name: "AT-802F Air Tractor", group: "air", kind: "seat", capacityGal: 820, speedKmh: 330, reloadMin: 12, dropLenM: 400, agent: "retardant", crew: 1, responseH: 1.5 },
+  { id: "HX-04", name: "Heavy helicopter (bucket)", group: "air", kind: "heli", capacityGal: 1320, speedKmh: 230, reloadMin: 4, dropLenM: 200, agent: "water", crew: 3, responseH: 2 },
+  { id: "HL-07", name: "Light helicopter (bucket)", group: "air", kind: "heli", capacityGal: 210, speedKmh: 200, reloadMin: 3, dropLenM: 100, agent: "water", crew: 2, responseH: 0.8 },
+  { id: "CO-1", name: "Air coordination aircraft", group: "air", kind: "airattack", capacityGal: 0, speedKmh: 300, reloadMin: 0, dropLenM: 0, agent: null, crew: 2, responseH: 1.5 },
+  { id: "FE-11", name: "Forest fire engine", group: "engines", kind: "engine", capacityGal: 900, speedKmh: 25, reloadMin: 0, dropLenM: 0, agent: null, crew: 5, responseH: 0.6 },
+  { id: "FE-12", name: "Forest fire engine", group: "engines", kind: "engine", capacityGal: 900, speedKmh: 25, reloadMin: 0, dropLenM: 0, agent: null, crew: 5, responseH: 1 },
+  { id: "WT-03", name: "Water tender", group: "engines", kind: "tender", capacityGal: 2600, speedKmh: 25, reloadMin: 0, dropLenM: 0, agent: null, crew: 2, responseH: 1.5 },
+  { id: "BR-01", name: "Forest brigade", group: "crews", kind: "crew", capacityGal: 0, speedKmh: 2, reloadMin: 0, dropLenM: 0, agent: null, crew: 20, responseH: 3 },
+  { id: "BR-02", name: "Forest brigade", group: "crews", kind: "crew", capacityGal: 0, speedKmh: 2, reloadMin: 0, dropLenM: 0, agent: null, crew: 20, responseH: 6 },
+  { id: "BD-01", name: "Bulldozer (firebreak)", group: "crews", kind: "dozer", capacityGal: 0, speedKmh: 3, reloadMin: 0, dropLenM: 0, agent: null, crew: 2, responseH: 5 },
+];
+
 export interface Drop {
   unit: string;
   t: number;
@@ -94,7 +110,7 @@ export class OpsSim {
   private containmentPts: [number, number][];
 
   constructor(private b: IncidentBundle) {
-    this.units = b.meta.fleet === "br" ? BR_UNITS : US_UNITS;
+    this.units = b.meta.fleet === "br" ? BR_UNITS : b.meta.fleet === "intl" ? INTL_UNITS : US_UNITS;
     const passes = passesWithFire(b);
     this.first = passes[0]?.t ?? b.meta.t0_epoch;
     this.end = Date.parse(b.meta.end) / 1000;

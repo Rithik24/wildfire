@@ -8,3 +8,7 @@ screenshots/
 __pycache__/
 *.pyc
 .venv/
+
+# rebuilt by the Pages workflow on every deploy
+public/data/live/
+public/data/live-*/

@@ -90,6 +90,8 @@ def list_scenes(tile, d0, d1):
         except Exception:
             continue
         props = it["properties"]
+        if not all(k in it.get("assets", {}) for k in ("visual", "nir", "swir22", "scl")):
+            continue
         items.append({
             "id": it["id"], "date": props["datetime"][:10], "cloud": props.get("eo:cloud_cover", 100),
             "nodata": props.get("s2:nodata_pixel_percentage", 0), "bbox": it["bbox"],

@@ -99,7 +99,7 @@ function chapters(b: IncidentBundle, fmt: Fmt): Chapter[] {
     unit: m.fleet === "br" ? "AT-01" : "T-131",
     cam: { center: head(air), zoom: zoomFor, pitch: 55, bearing: -20 },
   });
-  out.push({
+  if (m.method.b_channel === "dnbr") out.push({
     title: "Burn severity",
     body: "After the fire, Sentinel-2 shows how badly each 20–40 m pixel burned (dNBR). Severity only appears once a place has burned on the timeline.",
     t: end - 600,

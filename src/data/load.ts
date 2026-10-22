@@ -3,10 +3,11 @@ import type {
   Detections,
   HotspotTrack,
   IncidentBundle,
-  IncidentIndexItem,
+  IncidentIndex,
   IncidentMeta,
   Perimeters,
   Weather,
+  WorldFires,
 } from "./types";
 
 const DATA = "data/";
@@ -17,9 +18,17 @@ async function json<T>(url: string): Promise<T> {
   return r.json() as Promise<T>;
 }
 
-export async function loadIndex(): Promise<IncidentIndexItem[]> {
-  const idx = await json<{ incidents: IncidentIndexItem[] }>(DATA + "index.json");
-  return idx.incidents;
+export async function loadIndex(): Promise<IncidentIndex> {
+  // the live list changes every few hours: never serve a stale index from the HTTP cache
+  return json<IncidentIndex>(`${DATA}index.json?v=${Math.floor(Date.now() / 600000)}`);
+}
+
+export async function loadWorld(path: string): Promise<WorldFires> {
+  return json<WorldFires>(`${DATA}${path}?v=${Math.floor(Date.now() / 600000)}`);
+}
+
+export async function loadLand(): Promise<{ rings: [number, number][][] }> {
+  return json(DATA + "world-land.json");
 }
 
 /** Decode arrival.png: R,G = uint16 arrival step since t0 (65535 = never), B = dNBR or FRP class. */
@@ -63,9 +72,11 @@ async function loadArrival(url: string, meta: IncidentMeta): Promise<Arrival> {
   return { width: w, height: h, t, severity: sev, sorted, cellHa };
 }
 
-export async function loadIncident(id: string, onProgress?: (p: number) => void): Promise<IncidentBundle> {
+export async function loadIncident(id: string, onProgress?: (p: number) => void, version?: string): Promise<IncidentBundle> {
   const base = `${DATA}${id}/`;
-  const meta = await json<IncidentMeta>(base + "incident.json");
+  // live packages are rebuilt in place: version every file so a browser never mixes two builds
+  const q = version ? `?v=${encodeURIComponent(version)}` : "";
+  const meta = await json<IncidentMeta>(base + "incident.json" + q);
   onProgress?.(0.2);
   let done = 0;
   const tick = <T,>(p: Promise<T>) =>
@@ -75,11 +86,11 @@ export async function loadIncident(id: string, onProgress?: (p: number) => void)
       return v;
     });
   const [detections, hot, weather, arrival, perimeters] = await Promise.all([
-    tick(json<Detections>(base + "detections.json")),
-    tick(json<{ tracks: HotspotTrack[] }>(base + "hotspots.json")),
-    tick(json<Weather>(base + "weather.json").catch(() => null)),
-    tick(loadArrival(base + "arrival.png", meta)),
-    tick(json<Perimeters>(base + "perimeters.json")),
+    tick(json<Detections>(base + "detections.json" + q)),
+    tick(json<{ tracks: HotspotTrack[] }>(base + "hotspots.json" + q)),
+    tick(json<Weather>(base + "weather.json" + q).catch(() => null)),
+    tick(loadArrival(base + "arrival.png" + q, meta)),
+    tick(json<Perimeters>(base + "perimeters.json" + q)),
   ]);
-  return { meta, detections, tracks: hot.tracks, weather, arrival, perimeters, base };
+  return { meta, detections, tracks: hot.tracks, weather, arrival, perimeters, base, version: q };
 }

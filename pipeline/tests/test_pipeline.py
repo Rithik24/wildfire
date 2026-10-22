@@ -71,3 +71,43 @@ def test_weather_decoding():
 def test_haversine():
     assert abs(haversine_km(0, 0, 1, 0) - 111.19) < 0.1
     assert math.isclose(haversine_km(10, 10, 10, 10), 0.0)
+
+
+def test_openmeteo_parse_window():
+    import datetime as dt
+    from pipeline.weather import parse_openmeteo
+    j = {"hourly": {
+        "time": ["2026-10-20T00:00", "2026-10-20T01:00", "2026-10-21T05:00"],
+        "temperature_2m": [30.1, 29.5, 25.0], "relative_humidity_2m": [20, 22, 40],
+        "wind_speed_10m": [12.0, 15.5, 3.0], "wind_direction_10m": [90, 100, 180], "wind_gusts_10m": [25.0, 30.0, 8.0],
+    }}
+    t0 = dt.datetime(2026, 10, 20, 1, tzinfo=dt.timezone.utc)
+    t1 = dt.datetime(2026, 10, 20, 3, tzinfo=dt.timezone.utc)
+    h = parse_openmeteo(j, t0, t1)
+    assert [x["wspd"] for x in h] == [12.0, 15.5]
+    assert h[1]["t"] == int(dt.datetime(2026, 10, 20, 1, tzinfo=dt.timezone.utc).timestamp())
+    assert h[0]["rh"] == 20 and h[0]["gust"] == 25.0
+
+
+def test_live_selection_spreads_fires():
+    from pipeline.live import select
+    base = {"recent_24h": 100, "pixels": 500, "cells": 50, "area_km2_est": 200, "first": 0, "last": 1, "root": 0}
+    cx = [
+        dict(base, center=[114.0, -2.5], bbox=[113.9, -2.6, 114.1, -2.4]),
+        dict(base, center=[114.1, -2.6], bbox=[114.0, -2.7, 114.2, -2.5], area_km2_est=150),  # same fire region
+        dict(base, center=[133.0, -17.7], bbox=[132.9, -17.8, 133.1, -17.6]),
+        dict(base, center=[10.0, 10.0], bbox=[9.9, 9.9, 10.1, 10.1], recent_24h=0),  # out
+    ]
+    out = select(cx, 5)
+    assert sorted(c["center"] for c in out) == [[114.0, -2.5], [133.0, -17.7]]
+
+
+def test_gazetteer_ignores_unknown_population(tmp_path):
+    import json
+    from pipeline.live import Gazetteer
+    feats = [
+        {"geometry": {"coordinates": [10.0, 10.0]}, "properties": {"name": "Near", "adm1name": "A", "adm0name": "X", "pop_max": -99}},
+        {"geometry": {"coordinates": [-60.0, -24.0]}, "properties": {"name": "Far", "adm1name": "B", "adm0name": "Y", "pop_max": 50000}},
+    ]
+    (tmp_path / "ne_places.geojson").write_text(json.dumps({"features": feats}))
+    assert Gazetteer(str(tmp_path)).near(10.2, 10.1)["name"] == "Near"

@@ -153,6 +153,58 @@ def run(incident_id, out_dir):
     print(f"{incident_id}: {len(v)}/{len(hours)} hours with wind; {len(notes)} smoke/fire remarks")
 
 
+OPEN_METEO = "https://api.open-meteo.com/v1/forecast"
+OPEN_METEO_ARCHIVE = "https://archive-api.open-meteo.com/v1/archive"
+OM_VARS = "temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m"
+
+
+def parse_openmeteo(j, t0, t1):
+    """Open-Meteo hourly JSON -> the same hourly records as the station path."""
+    h = j["hourly"]
+    out = []
+    for i, ts in enumerate(h["time"]):
+        t = dt.datetime.fromisoformat(ts).replace(tzinfo=dt.timezone.utc)
+        if not (t0 - dt.timedelta(hours=1) <= t <= t1 + dt.timedelta(hours=1)):
+            continue
+        val = lambda k: h.get(k, [None] * len(h["time"]))[i]
+        out.append({
+            "t": int(t.timestamp()), "wspd": val("wind_speed_10m"), "wdir": val("wind_direction_10m"),
+            "gust": val("wind_gusts_10m"), "temp": val("temperature_2m"), "rh": val("relative_humidity_2m"),
+        })
+    return out
+
+
+def run_openmeteo(incident_id, out_dir):
+    """Hourly model weather at the fire (for live fires: station archives lag by months)."""
+    m = json.load(open(os.path.join(out_dir, incident_id, "incident.json")))
+    lon, lat = m["center"]
+    t0 = dt.datetime.fromisoformat(m["t0"].replace("Z", "+00:00"))
+    t1 = dt.datetime.fromisoformat(m["end"].replace("Z", "+00:00"))
+    now = dt.datetime.now(dt.timezone.utc)
+    params = {"latitude": round(lat, 4), "longitude": round(lon, 4), "hourly": OM_VARS, "timezone": "GMT", "wind_speed_unit": "kmh"}
+    if (now - t0).days < 90:
+        params.update({"past_days": min(92, (now - t0).days + 2), "forecast_days": 1})
+        url = OPEN_METEO
+    else:
+        params.update({"start_date": t0.date().isoformat(), "end_date": t1.date().isoformat()})
+        url = OPEN_METEO_ARCHIVE
+    r = requests.get(url, params=params, timeout=60)
+    r.raise_for_status()
+    j = r.json()
+    hours = parse_openmeteo(j, t0, t1)
+    out = {
+        "station": {"id": "open-meteo", "name": "Open-Meteo model, fire centre", "lat": j.get("latitude", lat), "lon": j.get("longitude", lon), "elev_m": j.get("elevation", 0)},
+        "source": "Open-Meteo hourly weather model data (CC BY 4.0)",
+        "prov": "external",
+        "units": {"wspd": "km/h", "gust": "km/h", "temp": "C", "rh": "%", "wdir": "deg (from)"},
+        "hourly": hours,
+        "notes": [],
+    }
+    with open(os.path.join(out_dir, incident_id, "weather.json"), "w") as f:
+        json.dump(out, f, separators=(",", ":"))
+    print(f"{incident_id}: {len(hours)} model hours from Open-Meteo")
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("incident", choices=sorted(INCIDENTS))

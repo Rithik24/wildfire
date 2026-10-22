@@ -10,6 +10,7 @@ export function TopBar() {
   const b = useStore((s) => s.bundle);
   const mode = useStore((s) => s.mode);
   const lang = useStore((s) => s.lang);
+  const liveCount = useStore((s) => s.index.filter((i) => i.live).length);
   const st = useStore(
     useShallow((s) => ({ view3d: s.view3d, exaggeration: s.exaggeration, units: s.units, tz: s.tz, theme: s.theme, compare: s.compare, layers: s.layers, sheetOpen: s.sheetOpen })),
   );
@@ -24,7 +25,7 @@ export function TopBar() {
   const modes: { id: Mode; icon: "flame" | "drone" | "layers"; label: string; badge?: number }[] = [
     { id: "incident", icon: "flame", label: t("incident") },
     { id: "drones", icon: "drone", label: t("drones"), badge: 6 },
-    { id: "resources", icon: "layers", label: t("resources"), badge: b.meta.fleet === "br" ? 13 : 14 },
+    { id: "resources", icon: "layers", label: t("resources"), badge: b.meta.fleet === "br" ? 13 : b.meta.fleet === "intl" ? 12 : 14 },
   ];
 
   return (
@@ -44,7 +45,8 @@ export function TopBar() {
         <span className="tag">{t("app_tag")}</span>
       </div>
       <span className="tb-sep" />
-      <button className="tb-incident" onClick={() => set({ panel: "incidents" })} title={t("incidents")}>
+      <button className="tb-incident" onClick={() => set({ panel: "incidents", pickerTab: b.meta.live ? "live" : "archive" })} title={t("incidents")}>
+        {b.meta.live && <span className="live-tag">LIVE</span>}
         <Icon name="flame" size={14} className="mobile-only" />
         <span className="inc-name">{b.meta.name}</span> <Icon name="chev" size={14} />
       </button>
@@ -53,6 +55,13 @@ export function TopBar() {
         <span className="hide-md">·</span>
         <Icon name="calendar" size={14} /> {fmt.date(t0)} · {days} d
       </span>
+      {liveCount > 0 && (
+        <button className="tb-live" onClick={() => set({ panel: "incidents", pickerTab: "live" })} title="Fires burning now, found by scanning every VIIRS fire pixel on Earth">
+          <span className="live-dot" />
+          <span className="lbl">{liveCount} burning now</span>
+          <span className="sm">{liveCount}</span>
+        </button>
+      )}
       <nav className="modes" aria-label="Mode">
         {modes.map((m) => (
           <button key={m.id} className={mode === m.id ? "on" : ""} onClick={() => set({ mode: m.id, follow: null, selectedDrone: m.id === "drones" ? useStore.getState().selectedDrone ?? "UAV-02" : useStore.getState().selectedDrone })} aria-pressed={mode === m.id}>

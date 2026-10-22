@@ -5,6 +5,7 @@ import { useFmt } from "../lib/format";
 import { Icon } from "./icons";
 import { Chip } from "./common";
 import { selectIncident } from "../app-actions";
+import { WorldMap } from "./WorldMap";
 
 function Modal({ children, onClose, wide }: { children: React.ReactNode; onClose: () => void; wide?: boolean }) {
   useEffect(() => {
@@ -37,34 +38,58 @@ function IncidentsModal({ onClose }: { onClose: () => void }) {
   const index = useStore((s) => s.index);
   const lang = useStore((s) => s.lang);
   const cur = useStore((s) => s.incidentId);
+  const tab = useStore((s) => s.pickerTab);
+  const worldPath = useStore((s) => s.worldPath);
+  const liveUpdated = useStore((s) => s.liveUpdated);
   const fmt = useFmt();
   const t = useT();
+  const [q, setQ] = useState("");
+  const live = index.filter((i) => i.live);
+  const archive = index.filter((i) => !i.live);
+  const list = (tab === "live" ? live : archive).filter((i) => !q || `${i.name} ${i.region} ${i.country}`.toLowerCase().includes(q.toLowerCase()));
+  const pick = (id: string) => {
+    onClose();
+    if (id !== cur) selectIncident(id);
+  };
   return (
     <Modal onClose={onClose} wide>
       <h2>{t("incidents")}</h2>
-      <p className="muted" style={{ margin: 0 }}>
-        Each incident is rebuilt from open satellite archives: VIIRS fire detections for the timing, Sentinel-2 for the burn scar, airport weather for the conditions.
+      <p className="muted" style={{ margin: "0 0 10px" }}>
+        Every fire is rebuilt from open satellite archives: VIIRS fire detections for the timing, Sentinel-2 for imagery and burn scars, weather at the fire.
+        {liveUpdated && ` Fires burning now are found by scanning every VIIRS pixel on Earth; last scan ${liveUpdated.replace("T", " ")} UTC.`}
       </p>
+      <WorldMap worldPath={worldPath} incidents={index} current={cur} onPick={pick} />
+      <div className="picker-bar">
+        <div className="seg" role="tablist">
+          <button role="tab" aria-selected={tab === "live"} className={tab === "live" ? "on" : ""} onClick={() => useStore.getState().set({ pickerTab: "live" })}>
+            <span className="live-dot" /> Burning now ({live.length})
+          </button>
+          <button role="tab" aria-selected={tab === "archive"} className={tab === "archive" ? "on" : ""} onClick={() => useStore.getState().set({ pickerTab: "archive" })}>
+            Archive ({archive.length})
+          </button>
+        </div>
+        <label className="find">
+          <Icon name="search" size={13} />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={`${t("find")}: name, region, country`} aria-label={t("find")} />
+        </label>
+      </div>
+      {tab === "live" && live.length === 0 && <p className="muted">No live scan in this build. The deployed site rescans the planet every few hours.</p>}
       <div className="inc-grid">
-        {index.map((i) => (
-          <button
-            key={i.id}
-            className={`inc-card ${i.id === cur ? "on" : ""}`}
-            onClick={() => {
-              onClose();
-              if (i.id !== cur) selectIncident(i.id);
-            }}
-          >
-            {i.thumb ? <img src={`data/${i.thumb}`} alt={`Burn scar of ${i.name}`} decoding="async" /> : <div style={{ aspectRatio: "16/10" }} />}
+        {list.map((i) => (
+          <button key={i.id} className={`inc-card ${i.id === cur ? "on" : ""}`} onClick={() => pick(i.id)}>
+            {i.thumb ? <img src={`data/${i.thumb}${i.live ? `?v=${encodeURIComponent(i.live.updated)}` : ""}`} alt={`Satellite view of ${i.name}`} decoding="async" /> : <div className="thumb-ph" />}
             <div className="b">
-              <b>{i.name}</b>
+              <b>
+                {i.live && <span className="live-tag">LIVE</span>} {i.name}
+              </b>
               <div className="muted">{i.region}</div>
               <div style={{ marginTop: 6, display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
-                <span>{startDate(i.start, lang)}</span>·<span>{fmt.area(i.area_ha)}</span>
+                <span>{i.live ? `since ${startDate(i.start, lang)}` : startDate(i.start, lang)}</span>·<span>{fmt.area(i.area_ha)}</span>
                 <Chip p="derived" />
               </div>
               <div className="muted" style={{ fontSize: 11.5, marginTop: 2 }}>
                 {fmt.num(i.detections)} VIIRS fire pixels
+                {i.live ? ` · ${fmt.num(i.live.active_24h)} in the last 24 h` : ""}
                 {i.reported_acres ? ` · reported ${fmt.num(i.reported_acres)} acres` : ""}
               </div>
             </div>

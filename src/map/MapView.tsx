@@ -108,8 +108,8 @@ export function MapView() {
       const gridCorners = b.meta.grid.corners as [[number, number], [number, number], [number, number], [number, number]];
       if (im) {
         const c = im.corners as [[number, number], [number, number], [number, number], [number, number]];
-        map.addSource("s2pre", { type: "image", url: b.base + "s2_pre.jpg", coordinates: c });
-        map.addSource("s2post", { type: "image", url: b.base + "s2_post.jpg", coordinates: c });
+        map.addSource("s2pre", { type: "image", url: b.base + "s2_pre.jpg" + b.version, coordinates: c });
+        map.addSource("s2post", { type: "image", url: b.base + "s2_post.jpg" + b.version, coordinates: c });
         map.addLayer({ id: "s2pre", type: "raster", source: "s2pre", paint: { "raster-fade-duration": 0 } });
         map.addLayer({ id: "s2post", type: "raster", source: "s2post", paint: { "raster-fade-duration": 0 } });
       }

@@ -33,20 +33,22 @@ const LAYERS: { id: LayerId; key: TKey; prov: Prov; sw: string; opacity?: boolea
 function LayersCard() {
   const layers = useStore((s) => s.layers);
   const hasS2 = useStore((s) => !!s.bundle?.meta.imagery);
+  const hasSeverity = useStore((s) => s.bundle?.meta.method.b_channel === "dnbr");
+  const live = useStore((s) => !!s.bundle?.meta.live);
   const t = useT();
   return (
     <div className="card">
       <h3>
         <Icon name="layers" /> {t("layers")}
       </h3>
-      {LAYERS.filter((l) => hasS2 || !l.id.startsWith("s2")).map((l) => {
+      {LAYERS.filter((l) => (hasS2 || !l.id.startsWith("s2")) && (hasSeverity || l.id !== "severity")).map((l) => {
         const st = layers[l.id];
         return (
           <div key={l.id} className={`layer ${st.on ? "" : "off"}`}>
             <input type="checkbox" checked={st.on} onChange={(e) => useStore.getState().setLayer(l.id, { on: e.target.checked })} aria-label={t(l.key)} />
             <span className="sw" style={{ background: l.sw }} />
             <span className="ln">
-              {t(l.key)} <Chip p={l.prov} />
+              {live && l.id === "s2post" ? "Sentinel-2 · latest" : t(l.key)} <Chip p={l.prov} />
             </span>
             {l.opacity ? (
               <span className="op">
@@ -90,7 +92,17 @@ function OverviewCard() {
       </h3>
       <dl className="kv">
         <dt>{t("o_incident")}</dt>
-        <dd>{m.name}</dd>
+        <dd>
+          {m.live && <span className="live-tag">LIVE</span>} {m.name}
+        </dd>
+        {m.live && (
+          <>
+            <dt>Status</dt>
+            <dd>
+              Burning: {fmt.num(m.live.active_24h)} fire pixels in the last 24 h · scan {m.live.updated.replace("T", " ")} UTC
+            </dd>
+          </>
+        )}
         <dt>{t("o_location")}</dt>
         <dd>{m.region}</dd>
         <dt>{t("o_window")}</dt>
@@ -149,7 +161,11 @@ function OverviewCard() {
           {fmt.num(m.stats.peak_frp_mw / 1000, 1)} GW <Chip p="real" />
         </dd>
         <dt>{t("o_method")}</dt>
-        <dd>{m.method.scar === "s2-dnbr" ? `Sentinel-2 dNBR ≥ ${m.method.dnbr_min}${m.method.nbr_post_max != null ? `, NBR ≤ ${m.method.nbr_post_max}` : ""} + VIIRS timing` : "VIIRS footprints"}</dd>
+        <dd>
+          {m.method.scar === "s2-dnbr"
+            ? `Sentinel-2 dNBR ≥ ${m.method.dnbr_min}${m.method.nbr_post_max != null ? `, NBR ≤ ${m.method.nbr_post_max}` : ""} + VIIRS timing`
+            : `VIIRS 375 m footprints${m.live ? " (fire still burning: no final scar yet; tends to overestimate)" : ""}`}
+        </dd>
       </dl>
     </div>
   );
@@ -206,7 +222,11 @@ function WeatherCard() {
       <h3>
         {t("conditions")} <span className="sub">{st ? `${st.name.split(",")[0].toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())}` : ""}</span>
         <span className="right-x">
-          <Chip p="real" title="NOAA Integrated Surface Database: hourly airport observations" />
+          {b.weather?.prov === "external" ? (
+            <Chip p="external" title="Open-Meteo hourly model data at the fire (station archives lag for live fires)" />
+          ) : (
+            <Chip p="real" title="NOAA Integrated Surface Database: hourly airport observations" />
+          )}
         </span>
       </h3>
       {w ? (
