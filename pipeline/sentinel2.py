@@ -119,7 +119,7 @@ def scene_arrays(item, g):
     return vis, nir, sw, scl
 
 
-def composite(items, g, max_scenes=8):
+def composite(items, g, max_scenes=14):
     H, W = g.height, g.width
     rgb = np.zeros((3, H, W), np.uint8)
     nbr = np.full((H, W), np.nan, np.float32)

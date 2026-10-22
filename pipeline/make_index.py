@@ -8,7 +8,7 @@ import json
 import os
 
 
-def main(out="public/data"):
+def main(out="public/data", archive_only=False):
     live, archive = [], []
     for d in sorted(os.listdir(out)):
         p = os.path.join(out, d, "incident.json")
@@ -22,6 +22,8 @@ def main(out="public/data"):
             "thumb": f"{d}/thumb.jpg" if os.path.exists(os.path.join(out, d, "thumb.jpg")) else None,
         }
         if m.get("live"):
+            if archive_only:
+                continue
             item["live"] = m["live"]
             live.append(item)
         else:
@@ -29,6 +31,8 @@ def main(out="public/data"):
     live.sort(key=lambda i: -i["live"].get("rank", 0))
     archive.sort(key=lambda i: i["start"], reverse=True)
     world = os.path.join(out, "live", "world.json")
+    if archive_only:
+        world = os.path.join(out, "no-such-file")
     idx = {
         "incidents": live + archive,
         "world": "live/world.json" if os.path.exists(world) else None,
@@ -40,4 +44,5 @@ def main(out="public/data"):
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+    main(archive_only="--archive-only" in sys.argv)

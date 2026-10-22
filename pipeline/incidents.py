@@ -152,7 +152,7 @@ INCIDENTS = {
         "origin": [-101.45, 35.83],
         "isd_station": "72363503024",  # Hutchinson County Airport (KBGD)
         "isd_fallback": ["72031303052", "72062600213"],
-        "s2_pre": ["2024-02-01", "2024-02-25"],
+        "s2_pre": ["2024-01-10", "2024-02-25"],
         "s2_post": ["2024-03-06", "2024-03-25"],
         "base": {"name": "Rick Husband Amarillo Intl", "lonlat": [-101.706, 35.219]},
         "icp": {"name": "Staging area (sim)", "lonlat": [-101.39, 35.70]},

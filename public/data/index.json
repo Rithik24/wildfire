@@ -1,6 +1,102 @@
 {
  "incidents": [
   {
+   "id": "larouco-2025",
+   "name": "Larouco Fire",
+   "region": "Ourense & Lugo, Galicia, Spain",
+   "country": "ES",
+   "start": "2025-08-13T12:27:22Z",
+   "end": "2025-08-27T00:00:00Z",
+   "center": [
+    -7.035,
+    42.44
+   ],
+   "area_ha": 41246.6,
+   "detections": 5931,
+   "reported_acres": 78525,
+   "thumb": "larouco-2025/thumb.jpg"
+  },
+  {
+   "id": "uiseong-2025",
+   "name": "Uiseong\u2013Andong Wildfire",
+   "region": "North Gyeongsang, South Korea",
+   "country": "KR",
+   "start": "2025-03-22T01:00:00Z",
+   "end": "2025-04-01T00:00:00Z",
+   "center": [
+    129.025,
+    36.375
+   ],
+   "area_ha": 102841.9,
+   "detections": 7619,
+   "reported_acres": null,
+   "thumb": "uiseong-2025/thumb.jpg"
+  },
+  {
+   "id": "ofunato-2025",
+   "name": "\u014cfunato Wildfire",
+   "region": "\u014cfunato, Iwate, Japan",
+   "country": "JP",
+   "start": "2025-02-26T03:00:00Z",
+   "end": "2025-03-10T00:00:00Z",
+   "center": [
+    141.74,
+    39.06
+   ],
+   "area_ha": 2221.9,
+   "detections": 250,
+   "reported_acres": 7166,
+   "thumb": "ofunato-2025/thumb.jpg"
+  },
+  {
+   "id": "eaton-2025",
+   "name": "Eaton Fire",
+   "region": "Altadena & Pasadena, Los Angeles County, California, USA",
+   "country": "US",
+   "start": "2025-01-08T02:00:00Z",
+   "end": "2025-01-20T00:00:00Z",
+   "center": [
+    -118.1,
+    34.21
+   ],
+   "area_ha": 5989.3,
+   "detections": 1608,
+   "reported_acres": 14021,
+   "thumb": "eaton-2025/thumb.jpg"
+  },
+  {
+   "id": "palisades-2025",
+   "name": "Palisades Fire",
+   "region": "Pacific Palisades, Los Angeles, California, USA",
+   "country": "US",
+   "start": "2025-01-07T16:00:00Z",
+   "end": "2025-01-20T00:00:00Z",
+   "center": [
+    -118.6,
+    34.08
+   ],
+   "area_ha": 10113.0,
+   "detections": 3655,
+   "reported_acres": 23448,
+   "thumb": "palisades-2025/thumb.jpg"
+  },
+  {
+   "id": "attica-2024",
+   "name": "Attica Wildfire (Varnavas)",
+   "region": "East Attica, Greece",
+   "country": "GR",
+   "start": "2024-08-11T11:00:00Z",
+   "end": "2024-08-17T00:00:00Z",
+   "center": [
+    23.9,
+    38.14
+   ],
+   "area_ha": 11214.4,
+   "detections": 1270,
+   "reported_acres": null,
+   "thumb": "attica-2024/thumb.jpg"
+  },
+  {
    "id": "park-2024",
    "name": "Park Fire",
    "region": "Butte & Tehama Counties, California, USA",
@@ -15,6 +111,22 @@
    "detections": 23026,
    "reported_acres": 429603,
    "thumb": "park-2024/thumb.jpg"
+  },
+  {
+   "id": "jasper-2024",
+   "name": "Jasper Wildfire",
+   "region": "Jasper National Park, Alberta, Canada",
+   "country": "CA",
+   "start": "2024-07-22T18:00:00Z",
+   "end": "2024-08-12T00:00:00Z",
+   "center": [
+    -118.025,
+    52.75
+   ],
+   "area_ha": 34305.3,
+   "detections": 4023,
+   "reported_acres": 80858,
+   "thumb": "jasper-2024/thumb.jpg"
   },
   {
    "id": "pantanal-2024",
@@ -33,20 +145,22 @@
    "thumb": "pantanal-2024/thumb.jpg"
   },
   {
-   "id": "palisades-2025",
-   "name": "Palisades Fire",
-   "region": "Pacific Palisades, Los Angeles, California, USA",
+   "id": "smokehouse-2024",
+   "name": "Smokehouse Creek Fire",
+   "region": "Texas Panhandle & Oklahoma, USA",
    "country": "US",
-   "start": "2025-01-07T16:00:00Z",
-   "end": "2025-01-20T00:00:00Z",
+   "start": "2024-02-26T19:48:25Z",
+   "end": "2024-03-06T00:00:00Z",
    "center": [
-    -118.6,
-    34.08
+    -100.735,
+    35.785
    ],
-   "area_ha": 10113.0,
-   "detections": 3655,
-   "reported_acres": 23448,
-   "thumb": "palisades-2025/thumb.jpg"
+   "area_ha": 460440.0,
+   "detections": 4719,
+   "reported_acres": 1058482,
+   "thumb": "smokehouse-2024/thumb.jpg"
   }
- ]
+ ],
+ "world": null,
+ "updated": null
 }
