@@ -148,7 +148,7 @@ export function MapHud({ mapRef }: { mapRef: RefObject<maplibregl.Map | null> })
       </div>
 
       <div className="hud bl attrib">
-        VIIRS 375 m active fire: NOAA EFIRE (S-NPP, NOAA-20, NOAA-21) via NOAA Open Data · Sentinel-2 L2A: Copernicus / ESA, Element 84 COGs · Weather: NOAA ISD · Terrain: AWS Terrain Tiles · Imagery: Esri
+        VIIRS 375 m active fire: NOAA EFIRE (S-NPP, NOAA-20, NOAA-21) via NOAA Open Data · Sentinel-2 L2A: Copernicus / ESA, Element 84 COGs · Weather: {b.weather?.prov === "external" ? "Open-Meteo (CC BY 4.0)" : "NOAA ISD"} · Terrain: AWS Terrain Tiles · Imagery: Esri
       </div>
 
       {compare != null && (
